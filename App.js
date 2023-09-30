@@ -5,6 +5,9 @@ import tw from 'tailwind-react-native-classnames';
 import StackNavigator from './StackNavigator';
 import { AuthProvider } from './hooks/useAuth';
 
+import { LogBox } from "react-native";
+LogBox.ignoreAllLogs();
+
 export default function App() {
 
   return (
