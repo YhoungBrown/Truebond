@@ -22,10 +22,12 @@ const ModalScreen = () => {
     const [job, setJob] = useState(null);
     const [age, setAge] = useState(null);
     const [displayName, setDisplayName] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const incompleteForm = !image || !job || !age;
 
     const updateUserProfile = () => {
+      setLoading(true);
         setDoc(doc(db, 'users', user.uid), {
             id: user.uid,
             displayName: displayName,
@@ -98,9 +100,9 @@ useLayoutEffect(() => {
 
       <TouchableOpacity
       disabled={incompleteForm}
-       style={[tw`w-64 p-3 rounded-xl absolute bottom-10`, incompleteForm ? tw`bg-gray-400` : tw`bg-red-400`]}>
+       style={[tw`w-64 p-3 rounded-xl absolute bottom-10`, incompleteForm ? tw`bg-gray-400` : tw`bg-red-400`]} onPress={updateUserProfile}>
         
-        <Text onPress={updateUserProfile} style={tw`text-center text-white text-xl`}>Update Profile</Text>
+        <Text style={tw`text-center text-white text-xl`}>Update Profile</Text>
       </TouchableOpacity>
     </View>
   )

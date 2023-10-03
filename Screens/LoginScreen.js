@@ -29,7 +29,7 @@ const LoginScreen = () => {
       <EmailNPasswordLogin />
 
       <TouchableOpacity style={[tw`absolute bottom-4 w-52 bg-white p-4 rounded-2xl`,{marginHorizontal: "25%"}]} onPress={signInWithGoogle}>
-        <Text style={tw`text-center font-semibold`}>Sign In and get Swipping</Text>
+        <Text style={tw`text-center font-semibold`}>Sign In With Google</Text>
       </TouchableOpacity>
 
      </ImageBackground>

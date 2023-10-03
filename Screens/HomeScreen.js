@@ -1,12 +1,14 @@
 import { Image, StatusBar, TouchableOpacity } from 'react-native';
 import { View, Text, Button, SafeAreaView} from 'react-native'
-import React, { useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import useAuth from '../hooks/useAuth';
 import tw from 'tailwind-react-native-classnames';
 
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons"
 import Swiper from 'react-native-deck-swiper';
+import { collection, doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../Firebase';
 
 
 
@@ -44,11 +46,19 @@ const DUMMY_DATA = [
     id: 4,
   },
   {
-    firstName: "Jane",
+    firstName: "Jenna",
     lastName: "Mcchena",
     job: "Real Estate Engineer",
     photoUrl: "https://wallpaper-mania.com/wp-content/uploads/2018/09/High_resolution_wallpaper_background_ID_77700954114.jpg",
     age: 27,
+    id: 5,
+  },
+  {
+    firstName: "Ariana",
+    lastName: "Grande",
+    job: "Musician",
+    photoUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQrEAZXkaDi-hKRLyGck4jyTzhcckUOBz1q4St3a1j-QmxMZLam",
+    age: 25,
     id: 5,
   },
 ]
@@ -61,23 +71,40 @@ const HomeScreen = () => {
     const swipeRef = useRef(null);
     const [profiles, setProfiles] = useState([]);
 
-    //const {name} = props;
-
-    //console.log(name)
-
-
-    //const goToModalScreen = (name) => {
-      //navigation.navigate("Modal", {name});
-   // };
+   
     
-    
+useEffect(() => {
+  let unsub;
 
+  const fetchCards = async () => {
+    unsub = onSnapshot(collection(db, 'users'), (snapshot) => (      setProfiles(
+        snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+      )
+    ))
+  }
+
+  console.log(profiles)
+
+  fetchCards();
+  return unsub;
+},[])
 
     useLayoutEffect(() => {
       navigation.setOptions({
         headerShown: false
-      })
-    })
+      });
+      
+      //for forcing registration modal to popup if there is no user registered
+     const unsub = onSnapshot(doc(db, 'Users', user.uid), (snapshot) => {
+      if(!snapshot.exists()){
+        navigation.navigate("Modal")
+      }
+     });
+     return unsub();
+    },[])
 
 
   return (
@@ -147,12 +174,12 @@ const HomeScreen = () => {
             <View key={card.id} style={tw`relative bg-white h-3/4 rounded-xl`}>
               <Image
               style={tw`absolute top-0 h-full w-full rounded-xl`} 
-                source={{uri: card.photoUrl}}
+                source={{uri: card.PhotoUrl}}
               />
 
               <View style={tw`absolute bottom-0 bg-white w-full h-20 justify-between items-center flex-row px-6 py-2 rounded-b-xl shadow-xl`}>
                 <View>
-                  <Text style={tw`text-xl font-bold`}>{card.firstName} {card.lastName}</Text>
+                  <Text style={tw`text-xl font-bold`}>{card.displayName}</Text>
                   <Text>{card.job}</Text>
                 </View>
                 <Text style={tw`text-2xl font-bold`}>{card.age}</Text>
