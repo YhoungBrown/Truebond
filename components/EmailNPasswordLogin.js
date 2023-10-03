@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
 
 import { auth, db } from '../Firebase'; // Import your Firebase config
@@ -26,6 +26,23 @@ function EmailNPasswordLogin() {
   //const { signInWithGoogle, logOut, memoedValue} = useContext(AuthContext);
   //const { user, setUser } = memoedValue;
   //const { signInWithGoogle, logOut, user, setUser } = useContext(AuthContext);
+
+
+  const Login = async () => {
+    try {
+      //const auth = getAuth(); // Get the auth instance from Firebase
+
+      // Sign in with email and password
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+      // Access the user from the userCredential
+      const user = userCredential.user;
+      console.log(user);
+    } catch (error) {
+      Alert.alert('Login Error', error.message);
+      console.error(error);
+    }
+  };
 
 
 
@@ -75,9 +92,17 @@ function EmailNPasswordLogin() {
         onChangeText={(password) => setPassword(password)}
       />
 
-      <TouchableOpacity style={tw`font-bold text-white`} onPress={onSignUp}>
-        <Text style={tw`font-bold text-white text-lg`}>Sign Up</Text>
+      <View style={tw`flex-row justify-center`}>
+
+      <TouchableOpacity style={tw`font-bold text-white px-1`} onPress={Login}>
+        <Text style={tw`font-bold text-white text-lg `}>Login</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={tw`font-bold text-white px-1`} onPress={onSignUp}>
+        <Text style={tw`font-bold text-white text-lg`}>| Sign Up</Text>
+      </TouchableOpacity>
+      
+      </View>
     </View>
   );
 }

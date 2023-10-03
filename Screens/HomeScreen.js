@@ -1,6 +1,6 @@
 import { Image, StatusBar, TouchableOpacity } from 'react-native';
 import { View, Text, Button, SafeAreaView} from 'react-native'
-import React, { useLayoutEffect, useRef } from 'react'
+import React, { useLayoutEffect, useRef, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import useAuth from '../hooks/useAuth';
 import tw from 'tailwind-react-native-classnames';
@@ -59,6 +59,7 @@ const HomeScreen = () => {
     const navigation = useNavigation();
     const {user, logOut} = useAuth();
     const swipeRef = useRef(null);
+    const [profiles, setProfiles] = useState([]);
 
     //const {name} = props;
 
@@ -110,7 +111,7 @@ const HomeScreen = () => {
       <Swiper 
           ref={swipeRef}
           containerStyle={{ backGroungColor: "transparent"}}
-          cards={DUMMY_DATA}
+          cards={profiles}
           stackSize={5}
           cardIndex={0}
           backgroundColor={"#4FD0E9"}
@@ -142,7 +143,7 @@ const HomeScreen = () => {
           }}
           animateCardOpacity
           verticalSwipe={false}
-          renderCard={card => (
+          renderCard={card => card ? (
             <View key={card.id} style={tw`relative bg-white h-3/4 rounded-xl`}>
               <Image
               style={tw`absolute top-0 h-full w-full rounded-xl`} 
@@ -157,6 +158,17 @@ const HomeScreen = () => {
                 <Text style={tw`text-2xl font-bold`}>{card.age}</Text>
               </View>
             </View>
+          ) : (
+              <View style={tw`relative bg-white h-3/4 rounded-xl justify-center items-center`}>
+                  <Text style={tw`font-bold pb-5`}>No more profiles...</Text>
+
+                  <Image 
+                    style={tw`h-40 w-40`}
+                    height={30}
+                    width={30}
+                    source={{ uri: "https://links.papareact.com/6gb" }}
+                  />
+              </View>
           )}
         />
 
