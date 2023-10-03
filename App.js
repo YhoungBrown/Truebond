@@ -11,17 +11,18 @@ LogBox.ignoreAllLogs();
 export default function App() {
 
   return (
-    <NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
     {/**HOC -> Higher Order Component*/}
-      <AuthProvider>
+      
       {/**Passes down the cool auth stuff to children */}
           <StackNavigator />
-      </AuthProvider>
+      
 
         <StatusBar style="auto" />
 
-    </NavigationContainer>
-
+        </NavigationContainer>
+    </AuthProvider>
     
   );
 }

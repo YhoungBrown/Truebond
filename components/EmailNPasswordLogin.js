@@ -1,71 +1,85 @@
-import React, { Component } from 'react';
-import { View, Button, TextInput} from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 
-import firebase from 'firebase';
-//import firebase from 'firebase/compat/app';
-import { TouchableOpacity } from 'react-native';
-//import 'firebase/compat/auth';
-//import 'firebase/compat/firestore';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc, getFirestore } from 'firebase/firestore';
 
-export class EmailNPasswordLogin extends Component {
-    constructor(props){
-        super(props);
+import { auth, db } from '../Firebase'; // Import your Firebase config
 
-        this.state = {
-            email: '',
-            password: '',
-            name: ''
-        }
+import { AuthContext } from '../hooks/useAuth';
+import { useNavigation } from '@react-navigation/native';
 
-        this.onSignUp = this.onSignUp.bind(this)
+
+
+
+
+
+function EmailNPasswordLogin() {
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [name, setName] = useState(null);
+  console.log(name)
+
+  const navigation = useNavigation()
+
+  //const { signInWithGoogle, logOut, memoedValue} = useContext(AuthContext);
+  //const { user, setUser } = memoedValue;
+  //const { signInWithGoogle, logOut, user, setUser } = useContext(AuthContext);
+
+
+
+  const onSignUp = async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  
+      if (userCredential) {
+        const { uid } = userCredential.user;
+  
+        // First, set the user document in Firestore
+        const userDocRef = doc(db, 'users', uid);
+        await setDoc(userDocRef, {
+          name,
+          email,
+        });
+  
+        // Then, set the user in the context
+        //setUser(uid);
+        navigation.navigate("Modal");
+        Alert.alert("Registration Successful", "set up your Profile", [{text: "OK"}]);
+        console.log('Registration success');
+      }
+    } catch (error) {
+      alert("Registration Error", error)
+      console.error('Registration error', error);
     }
+  };
+  
 
-    onSignUp(){
-        const { email, password, name} = this.state;
-        //registration function
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-        //the above is a synchronise function that runs withouth interupting our app, and when a response is recieved from the firebase server, the below will run
-        .then((result) => {
-          firebase.firestore().collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .set({
-            name,
-            email
-          })
-          console.log(result)
-        })
-          //the below is for if something goes wrong or the server returns an error, then the below will be called (will run)
-        .catch((error) => {
-          console.log(error)
-        })
-    }
+  return (
+    <View style={[tw`absolute bottom-20 pb-2 items-center`, { marginHorizontal: '25%' }]}>
+      <TextInput
+        style={tw`w-52 p-2 rounded-2xl border border-white mb-2`}
+        placeholder="Name"
+        onChangeText={(name) => setName(name)}
+      />
+      <TextInput
+        style={tw`w-52 p-2 rounded-2xl border border-white mb-2`}
+        placeholder="Email"
+        onChangeText={(email) => setEmail(email)}
+      />
+      <TextInput
+        style={tw`w-52 p-2 rounded-2xl border border-white mb-2`}
+        placeholder="Password"
+        secureTextEntry={true}
+        onChangeText={(password) => setPassword(password)}
+      />
 
-  render() {
-    return (
-      <View>
-            <TextInput 
-               placeholder= "name" 
-               onChangeText={(name) => this.setState({name})}
-            />
-            <TextInput 
-               placeholder= "email" 
-               onChangeText={(email) => this.setState({email})}
-            />
-            <TextInput 
-               placeholder= "password" 
-               secureTextEntry={true}
-               onChangeText={(password) => this.setState({password})}
-            />
-
-            <TouchableOpacity 
-                onPress={() => this.onSignUp()}>
-                    <Text>Sign Up</Text>
-            </TouchableOpacity>
-            
-      </View>
-    )
-  }
+      <TouchableOpacity style={tw`font-bold text-white`} onPress={onSignUp}>
+        <Text style={tw`font-bold text-white text-lg`}>Sign Up</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
-export default EmailNPasswordLogin
+export default EmailNPasswordLogin;

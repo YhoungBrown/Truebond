@@ -26,13 +26,13 @@
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "~3.22.0",
     "tailwind-react-native-classnames": "^1.5.1",
-    "tailwind-rn": "^4.2.0"
+    "tailwind-rn": "^4.2.0",
+    "tailwindcss": "^3.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "concurrently": "^8.2.1",
-    "postcss": "^8.4.30",
-    "tailwindcss": "^3.3.3",
+    "postcss": "^8.4.23",
     "tailwindcss-react-native": "^1.7.10"
   },
   "resolutions": {

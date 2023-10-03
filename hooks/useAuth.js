@@ -10,6 +10,8 @@ import {
 } from "@firebase/auth";
 import { auth } from '../Firebase';
 
+import EmailNPasswordLogin from '../components/EmailNPasswordLogin';
+
 
 const AuthContext = createContext({});
 
@@ -30,11 +32,12 @@ export const AuthProvider = ({ children }) => {
       if (user) {
         //logged in
         setUser(user);
+       
       }else{
        //not logged in 
        setUser(null);
       }
-
+      console.log(user)
       setLoadingInitial(false);
     }),
    [])
@@ -66,18 +69,25 @@ export const AuthProvider = ({ children }) => {
     }
 
 
-    const memoedValue = useMemo(() => ({ 
+   // const memoedValue = useMemo(() => ({ 
+     // user,
+     // loading,
+      //error,
+      //signInWithGoogle,
+     // logOut,
+     // setUser,
+      //EmailNPasswordLogin
+   // }), //[loading, error, user])
+
+  return (
+    <AuthContext.Provider value={{
       user,
       loading,
       error,
       signInWithGoogle,
       logOut,
-    }), [loading, error, user])
-
-  return (
-    <AuthContext.Provider value={{
-      //user: "Omotola",
-      memoedValue
+      EmailNPasswordLogin
+      //memoedValue
       }}>
       {!loadingInitial && children}
     </AuthContext.Provider>

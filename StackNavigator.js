@@ -11,11 +11,9 @@ import ModalScreen from './Screens/ModalScreen';
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
-    const {user} = useAuth();
+  const { user } = useAuth();
   return (
-    <Stack.Navigator defaultScreenOptions ={{
-      headerShown: false
-    }}>
+    <Stack.Navigator defaultScreenOptions={{ headerShown: false }}>
     {user ? (
         <>
         <Stack.Group>

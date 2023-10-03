@@ -4,7 +4,7 @@ import React, { useLayoutEffect } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
 
-//import EmailNPasswordLogin from '../components/EmailNPasswordLogin';
+import EmailNPasswordLogin from '../components/EmailNPasswordLogin';
 import useAuth from '../hooks/useAuth'
 
 const LoginScreen = () => {
@@ -25,7 +25,10 @@ const LoginScreen = () => {
      source={{uri:"https://tinder.com/static/tinder.png"}}
      >
 
-      <TouchableOpacity style={[tw`absolute bottom-10 w-52 bg-white p-4 rounded-2xl`,{marginHorizontal: "25%"}]} onPress={signInWithGoogle}>
+
+      <EmailNPasswordLogin />
+
+      <TouchableOpacity style={[tw`absolute bottom-4 w-52 bg-white p-4 rounded-2xl`,{marginHorizontal: "25%"}]} onPress={signInWithGoogle}>
         <Text style={tw`text-center font-semibold`}>Sign In and get Swipping</Text>
       </TouchableOpacity>
 

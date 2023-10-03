@@ -59,7 +59,18 @@ const HomeScreen = () => {
     const navigation = useNavigation();
     const {user, logOut} = useAuth();
     const swipeRef = useRef(null);
+
+    //const {name} = props;
+
+    //console.log(name)
+
+
+    //const goToModalScreen = (name) => {
+      //navigation.navigate("Modal", {name});
+   // };
     
+    
+
 
     useLayoutEffect(() => {
       navigation.setOptions({
