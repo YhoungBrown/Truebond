@@ -1,11 +1,25 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, SafeAreaView} from 'react-native'
+import React, { useLayoutEffect } from 'react'
+import Header from '../components/Header'
+import { useNavigation } from '@react-navigation/native'
+import ChatList from '../components/ChatList'
+
 
 const ChatScreen = () => {
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false
+    });
+},[]);
+
+
   return (
-    <View>
-      <Text>I Am ChatScreen</Text>
-    </View>
+    <SafeAreaView>
+      <Header title="Chat" callEnabled/>
+      <ChatList />
+    </SafeAreaView>
   )
 }
 

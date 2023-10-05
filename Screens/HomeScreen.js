@@ -7,8 +7,9 @@ import tw from 'tailwind-react-native-classnames';
 
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons"
 import Swiper from 'react-native-deck-swiper';
-import { collection, doc, onSnapshot } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
 import { db } from '../Firebase';
+import generateId from '../lib/generateId';
 
 
 
@@ -77,13 +78,38 @@ useEffect(() => {
   let unsub;
 
   const fetchCards = async () => {
-    unsub = onSnapshot(collection(db, 'users'), (snapshot) => (      setProfiles(
-        snapshot.docs.map(doc => ({
+    const passesCollection = collection(db, 'users', user.uid, 'Passes');
+    const matchesCollection = collection(db, 'users', user.uid, 'Matches');
+
+     try {
+      // Wait for the passes to be retrieved
+      const snapshot = await getDocs(passesCollection);
+      const passes = snapshot.docs.map((doc) => doc.id);
+      console.log(passes);
+      const passedUsersId = passes.length > 0 ? passes : ["test"];
+
+
+      const matchesSnapshot = await getDocs(matchesCollection);
+      const matches = matchesSnapshot.docs.map((doc) => doc.id);
+      console.log(matches);
+      const matchedUsersId = matches.length > 0 ? matches : ["test"];
+
+    //the query below if so that when we're fetching our data from firebase, users that we have in our swipedPass should not show again. if we dont do this, we'll have to keep swipping over a user repititively evrytime we login when there are lot of other profiles that we havent even seen yet
+
+    unsub = onSnapshot(query(collection(db, 'users'), where("id", "not-in", [...passedUsersId, ...matchedUsersId])), (snapshot) => (      
+      setProfiles(
+      //the filter is to remove any doc id that matches the user uid(since it is the user uid tht also serve as the doc id) that way we wont see our own profile when swipping inorder to prevent going on a date with ourself
+        snapshot.docs
+        .filter((doc) => doc.id !== user.uid)
+        .map(doc => ({
           id: doc.id,
           ...doc.data()
         }))
       )
     ))
+      } catch (error) {
+        console.error('Error fetching passes:', error);
+      }
   }
 
   console.log(profiles)
@@ -104,7 +130,56 @@ useEffect(() => {
       }
      });
      return unsub();
-    },[])
+    },[]);
+
+
+    const swipeLeft = (cardIndex) => {
+      if (!profiles[cardIndex]) return;
+
+       const userSwiped = profiles[cardIndex];
+       console.log(`You swiped PASS on ${userSwiped.displayName} `);
+
+       setDoc(doc(db, 'users', user.uid, 'Passes', userSwiped.id), userSwiped);
+    };
+
+    const swipeRight = async (cardIndex) => {
+      if (!profiles[cardIndex]) return;
+
+      const userSwiped = profiles[cardIndex];
+      const loggedInProfile = await (
+        await getDoc(doc(db, 'users', user.uid))
+      ).data();
+
+      //check if the user swiped Match on you
+        getDoc(doc(db, 'users', userSwiped.id, "Matches", user.uid)).then((documentSnapshot) => {
+          if (documentSnapshot.exists()){
+            //user has matched with you before you match with them
+
+            console.log(`Hurray you and ${userSwiped.displayName} have Mutually MATCHED`)
+
+            setDoc(doc(db, 'users', user.uid, 'Matches', userSwiped.id), userSwiped);
+
+            //CREATE A MATCH
+            setDoc(doc(db, 'mutualMatches', generateId(user.uid, userSwiped.id)), {
+              users:{
+                [user.uid]: loggedInProfile,
+                [userSwiped.id]: userSwiped,
+              },
+              usersMatched: [user.uid, userSwiped.id],
+              timestamp: serverTimestamp(),
+            });
+
+            navigation.navigate("Match", {loggedInProfile, userSwiped,});
+
+          } else {
+            //user swiped right first or they did get a swipe right in return
+            console.log(`You swiped MATCH on ${userSwiped.displayName} (${userSwiped.job})`);
+
+
+            setDoc(doc(db, 'users', user.uid, 'Matches', userSwiped.id), userSwiped);
+          }
+        })
+    };
 
 
   return (
@@ -142,11 +217,13 @@ useEffect(() => {
           stackSize={5}
           cardIndex={0}
           backgroundColor={"#4FD0E9"}
-          onSwipedLeft={() => {
+          onSwipedLeft={(cardIndex) => {
             console.log("Swipe Pass")
+            swipeLeft(cardIndex)
           }}
-          onSwipedRight={() => {
+          onSwipedRight={(cardIndex) => {
             console.log("Swipe Matched")
+            swipeRight(cardIndex)
           }}
           overlayLabels={{
             left: {
