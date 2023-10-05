@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
 
 import { auth, db } from '../Firebase'; // Import your Firebase config
@@ -52,6 +52,10 @@ function EmailNPasswordLogin() {
   
       if (userCredential) {
         const { uid } = userCredential.user;
+
+        await updateProfile(userCredential.user, {
+          displayName: name,
+        });
   
         // First, set the user document in Firestore
         const userDocRef = doc(db, 'users', uid);

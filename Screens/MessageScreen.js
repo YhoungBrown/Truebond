@@ -7,11 +7,13 @@ import { useRoute } from '@react-navigation/native'
 
 
 const MessageScreen = () => {
+    console.log('MessageScreen rendered'); 
     const {user} = useAuth();
     const {params} = useRoute();
     const {matchDetails} = params;
-   // console.log(matchDetails)
-    console.log(user.uid)
+    //console.log(matchDetails)
+   //console.log(user)
+    
   return (
     <SafeAreaView>
     <Header title={getMatchedUserInfo(matchDetails?.users, user.uid).displayName} callEnabled/>
