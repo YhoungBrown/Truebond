@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, FlatList, ActivityIndicator} from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
 import getMatchedUserInfo from '../lib/getMatchedUserInfo'
 import useAuth from '../hooks/useAuth'
@@ -25,7 +25,12 @@ const MessageScreen = () => {
    const [loading, setLoading] = useState(false);
 
 
+   const flatListRef = useRef(null);
 
+   // Use this function to scroll to the bottom of the list
+   const scrollToBottom = () => {
+     flatListRef.current.scrollToEnd({ animated: false });
+   };
 
 
 
@@ -39,6 +44,7 @@ const MessageScreen = () => {
         })).reverse(); // Reverse the order here
   
         setMessages(reversedMessages);
+        scrollToBottom();
       }
     );
   }, [matchDetails, db]);
@@ -100,6 +106,9 @@ const MessageScreen = () => {
                 data={messages}
                 //or you can also use inverted=(-1) as a property to the flatlist to made change the order with which it displays
                 style={tw`pl-4`}
+                ref={flatListRef} // Reference to the FlatList
+                onContentSizeChange={scrollToBottom} // Scroll to bottom when content size changes
+                onLayout={scrollToBottom} // Scroll to bottom when layout changes
                 keyExtractor={item => item.id}
                 renderItem={({item : message}) => message.userId === user.uid ? 
                 (
