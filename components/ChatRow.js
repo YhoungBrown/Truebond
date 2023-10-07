@@ -4,11 +4,14 @@ import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth';
 import getMatchedUserInfo from '../lib/getMatchedUserInfo';
 import tw from 'tailwind-react-native-classnames';
+import { db } from '../Firebase';
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 const ChatRow = ({ matchDetails }) => {
   const navigation = useNavigation();
   const { user } = useAuth();
   const [matchedUserInfo, setMatchedUserInfo] = useState(null);
+  const {lastMessage, setLastMessage} = useState("");
 
   useEffect(() => {
     // Ensure that matchDetails and user exist before fetching user info
@@ -18,7 +21,25 @@ const ChatRow = ({ matchDetails }) => {
     }
   }, [matchDetails, user]);
 
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(collection(db, "mutualMatches", matchDetails.id, "messages")),
+      orderBy("timestamp", "desc"),
+      (snapshot) => {
+        setLastMessage(snapshot.docs[0]?.data()?.message);
+        
+        // Log the value here, inside the useEffect
+        console.log(lastMessage);
+      }
+    );
+  
+    // Return the unsubscribe function to clean up the snapshot listener
+    return () => unsubscribe();
+  }, [matchDetails]);
+  
+
  // console.log(matchedUserInfo)
+ //console.log(matchDetails)
 
   // If matchedUserInfo is not available yet, display a loading message
   if (!matchedUserInfo) {
@@ -43,7 +64,7 @@ const ChatRow = ({ matchDetails }) => {
         <Text style={tw`text-lg font-semibold`}>
           {matchedUserInfo.displayName || 'No Name'} {/* Handle missing display name */}
         </Text>
-        <Text>Say Hi!</Text>
+        <Text>{lastMessage || "Say Hi"}</Text>
       </View>
     </TouchableOpacity>
   );
