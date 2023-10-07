@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from 'react';
+//import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import { TouchableOpacity, View, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth';
 import getMatchedUserInfo from '../lib/getMatchedUserInfo';
 import tw from 'tailwind-react-native-classnames';
 import { db } from '../Firebase';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { Timestamp, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 const ChatRow = ({ matchDetails }) => {
   const navigation = useNavigation();
   const { user } = useAuth();
   const [matchedUserInfo, setMatchedUserInfo] = useState(null);
-  const {lastMessage, setLastMessage} = useState("");
+  const [lastMessage, setLastMessage] = useState("");
+  const MAX_MESSAGE_LENGTH = 35;
+
 
   useEffect(() => {
     // Ensure that matchDetails and user exist before fetching user info
@@ -21,21 +25,34 @@ const ChatRow = ({ matchDetails }) => {
     }
   }, [matchDetails, user]);
 
+
+//useEffect for fetching last messages
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      query(collection(db, "mutualMatches", matchDetails.id, "messages")),
-      orderBy("timestamp", "desc"),
+      query(
+        collection(db, "mutualMatches", matchDetails.id, "messages"),
+        orderBy("timestamp", "desc")
+      ),
       (snapshot) => {
-        setLastMessage(snapshot.docs[0]?.data()?.message);
+        const orderedMessages = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const timestamp = data.timestamp; // Replace with your actual timestamp field name
+          console.log("Timestamp:", timestamp); // Log the timestamp
+          return data;
+        });
+        setLastMessage(orderedMessages[0]?.message);
         
         // Log the value here, inside the useEffect
         console.log(lastMessage);
+
       }
     );
   
     // Return the unsubscribe function to clean up the snapshot listener
     return () => unsubscribe();
-  }, [matchDetails]);
+  }, [matchDetails, db, setLastMessage]);
+
+  
   
 
  // console.log(matchedUserInfo)
@@ -64,7 +81,11 @@ const ChatRow = ({ matchDetails }) => {
         <Text style={tw`text-lg font-semibold`}>
           {matchedUserInfo.displayName || 'No Name'} {/* Handle missing display name */}
         </Text>
-        <Text>{lastMessage || "Say Hi"}</Text>
+        <Text>
+        {lastMessage && lastMessage.length > MAX_MESSAGE_LENGTH
+          ? `${lastMessage.slice(0, MAX_MESSAGE_LENGTH)}...`
+          : lastMessage || "Say Hi"}
+      </Text>
       </View>
     </TouchableOpacity>
   );
