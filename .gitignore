@@ -38,7 +38,7 @@ yarn-error.*
 credentials.json
 
 #android app doc containing api and client id
-google-services.json
+google-services (1).json
 
 #ios app doc containing api and client id
-GoogleService-Info.plist
+GoogleService-Info (1).plist
