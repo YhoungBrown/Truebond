@@ -42,6 +42,7 @@ function EmailNPasswordLogin() {
       console.log(user);
       setLoading(false)
     } catch (error) {
+      setLoading(false)
       Alert.alert('Login Error', error.message);
       console.error(error);
     }
@@ -76,6 +77,7 @@ function EmailNPasswordLogin() {
         console.log('Registration success');
       }
     } catch (error) {
+      setLoading(false)
       alert("Registration Error", error)
       console.error('Registration error', error);
     }
