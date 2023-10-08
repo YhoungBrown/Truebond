@@ -29,7 +29,9 @@ const MessageScreen = () => {
 
    // Use this function to scroll to the bottom of the list
    const scrollToBottom = () => {
-     flatListRef.current.scrollToEnd({ animated: false });
+    if (flatListRef.current && messages.length > 0) {
+      flatListRef.current.scrollToEnd({ animated: false });
+    }
    };
 
 

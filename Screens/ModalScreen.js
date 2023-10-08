@@ -8,6 +8,7 @@ import { TouchableOpacity } from 'react-native';
 import { db } from '../Firebase';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import EmailNPasswordLogin from '../components/EmailNPasswordLogin';
+import { ActivityIndicator } from 'react-native';
 
 
 const ModalScreen = () => {
@@ -35,9 +36,13 @@ const ModalScreen = () => {
             job: job,
             age: age,
             timestamp: serverTimestamp()
-        }).then(() => { navigation.navigate("Home")
+        }).then(() => { 
+          setLoading(false);
+          navigation.navigate("Home")
             //navigation.navigate("Home")
-        }).catch(error => {alert(error.message)});
+        }).catch(error => {
+          setLoading(false);
+          alert(error.message)});
     }
 
 useLayoutEffect(() => {
@@ -49,14 +54,15 @@ useLayoutEffect(() => {
   return (
     <View style={tw`flex-1 items-center pt-3`}>
      <Image 
-        style={tw`h-20 w-full z-20`}
+        style={tw`h-20 w-40 z-20`}
         resizeMode="contain"
-        source={{uri: "https://links.papareact.com/2pf"}}
+        //source={{uri: "https://links.papareact.com/2pf"}}
+        source={require('../assets/TrueBond.png')}
      />
 
      <Text style={tw`text-xl text-gray-500 font-bold p-2`}>Welcome {user.name || user.dispalyName}</Text>
 
-     <Text  style={tw`text-center text-red-400 font-bold p-4`}>
+     <Text  style={[tw`text-center font-bold p-4`, {color: "#a82597"}]}>
         Step 1: The Profile Picture
      </Text>
      <TextInput
@@ -66,7 +72,7 @@ useLayoutEffect(() => {
       placeholder='Enter a profile picture url'/>
 
 
-     <Text style={tw`text-center text-red-400 font-bold p-4`}>
+     <Text style={[tw`text-center font-bold p-4`, {color: "#a82597"}]}>
         Step 2: Display Name
      </Text>
      <TextInput
@@ -76,7 +82,7 @@ useLayoutEffect(() => {
       placeholder='Enter your Display Name'/>
 
 
-     <Text style={tw`text-center text-red-400 font-bold p-4`}>
+     <Text style={[tw`text-center font-bold p-4`, {color: "#a82597"}]}>
         Step 3: The Job
      </Text>
      <TextInput
@@ -86,7 +92,7 @@ useLayoutEffect(() => {
       placeholder='Enter your Occupation'/>
 
 
-     <Text style={tw`text-center text-red-400 font-bold p-4`}>
+     <Text style={[tw`text-center font-bold p-4`, {color: "#a82597"}]}>
         Step 4: The Age
      </Text>
      <TextInput
@@ -104,6 +110,13 @@ useLayoutEffect(() => {
         
         <Text style={tw`text-center text-white text-xl`}>Update Profile</Text>
       </TouchableOpacity>
+
+       {/* Display loading indicator when loading is true */}
+       {loading && (
+                <View style={tw`absolute bottom-20`}>
+                    <ActivityIndicator size="large" color="#A82597" />
+                </View>
+            )}
     </View>
   )
 }

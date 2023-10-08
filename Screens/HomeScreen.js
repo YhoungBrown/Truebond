@@ -212,13 +212,13 @@ const HomeScreen = () => {
           <Image
             style={tw`h-10 w-10 rounded-full`} 
             source={{ uri: profilepix }}
-            onError={() => console.log("Image load error")} // Handle errors
-/>
+            onError={() => console.log("Image load error")} // Handle errors.
+          />
 
         </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Modal")}>
-        <Image style={tw`h-20 w-20`} resizeMode='contain' source={require('../assets/tinderName.png')}/>
+        <Image style={tw`h-20 w-40`} resizeMode='contain' source={require('../assets/TrueBond.png')}/>
       </TouchableOpacity>
 
       <TouchableOpacity>

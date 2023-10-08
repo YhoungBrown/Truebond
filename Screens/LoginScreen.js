@@ -22,7 +22,8 @@ const LoginScreen = () => {
      <ImageBackground
      resizeMode='cover'
      style={tw`flex-1`}
-     source={{uri:"https://tinder.com/static/tinder.png"}}
+     //source={{uri:"https://tinder.com/static/tinder.png"}}
+     source={require("../assets/manNwoman(black).jpg")}
      >
 
 

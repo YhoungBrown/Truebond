@@ -87,18 +87,21 @@ function EmailNPasswordLogin() {
   return (
     <View style={[tw`absolute bottom-20 pb-2 items-center`, { marginHorizontal: '25%' }]}>
       <TextInput
-        style={tw`w-52 p-2 rounded-2xl border border-white mb-2`}
+        style={tw`w-52 p-2 rounded-2xl border border-white mb-2 text-white`}
         placeholder="Name"
+        placeholderTextColor="#FFF"
         onChangeText={(name) => setName(name)}
       />
       <TextInput
-        style={tw`w-52 p-2 rounded-2xl border border-white mb-2`}
+        style={tw`w-52 p-2 rounded-2xl border border-white mb-2 text-white`}
         placeholder="Email"
+        placeholderTextColor="#FFF"
         onChangeText={(email) => setEmail(email)}
       />
       <TextInput
-        style={tw`w-52 p-2 rounded-2xl border border-white mb-2`}
+        style={tw`w-52 p-2 rounded-2xl border border-white mb-2 text-white`}
         placeholder="Password"
+        placeholderTextColor="#FFF"
         secureTextEntry={true}
         onChangeText={(password) => setPassword(password)}
       />
