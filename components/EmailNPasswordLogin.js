@@ -118,9 +118,11 @@ function EmailNPasswordLogin() {
           <TouchableOpacity style={tw`font-bold text-white px-1`} onPress={Login}>
             <Text style={tw`font-bold text-white text-lg `}>Login</Text>
           </TouchableOpacity>
+
+          <Text style={tw`font-bold text-white text-lg`}> | </Text>
   
           <TouchableOpacity style={tw`font-bold text-white px-1`} onPress={onSignUp}>
-            <Text style={tw`font-bold text-white text-lg`}>| Sign Up</Text>
+            <Text style={tw`font-bold text-white text-lg`}>Sign Up</Text>
           </TouchableOpacity>
         </View>
       )}

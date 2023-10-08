@@ -13,7 +13,7 @@ import generateId from '../lib/generateId';
 
 
 
-const DUMMY_DATA = [
+{/**const DUMMY_DATA = [
   {
     firstName: "Sonny",
     lastName: "Sangha",
@@ -62,7 +62,7 @@ const DUMMY_DATA = [
     age: 25,
     id: 5,
   },
-]
+]*/}
 
 
 
