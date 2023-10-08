@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
@@ -19,6 +19,7 @@ function EmailNPasswordLogin() {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [name, setName] = useState(null);
+  const [loading, setLoading] = useState(false);
   console.log(name)
 
   const navigation = useNavigation()
@@ -29,6 +30,7 @@ function EmailNPasswordLogin() {
 
 
   const Login = async () => {
+    setLoading(true)
     try {
       //const auth = getAuth(); // Get the auth instance from Firebase
 
@@ -38,6 +40,7 @@ function EmailNPasswordLogin() {
       // Access the user from the userCredential
       const user = userCredential.user;
       console.log(user);
+      setLoading(false)
     } catch (error) {
       Alert.alert('Login Error', error.message);
       console.error(error);
@@ -47,6 +50,7 @@ function EmailNPasswordLogin() {
 
 
   const onSignUp = async () => {
+    setLoading(true)
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   
@@ -67,6 +71,7 @@ function EmailNPasswordLogin() {
         // Then, set the user in the context
         //setUser(uid);
         navigation.navigate("Modal");
+        setLoading(false);
         Alert.alert("Registration Successful", "set up your Profile", [{text: "OK"}]);
         console.log('Registration success');
       }
@@ -95,20 +100,28 @@ function EmailNPasswordLogin() {
         secureTextEntry={true}
         onChangeText={(password) => setPassword(password)}
       />
-
-      <View style={tw`flex-row justify-center`}>
-
-      <TouchableOpacity style={tw`font-bold text-white px-1`} onPress={Login}>
-        <Text style={tw`font-bold text-white text-lg `}>Login</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={tw`font-bold text-white px-1`} onPress={onSignUp}>
-        <Text style={tw`font-bold text-white text-lg`}>| Sign Up</Text>
-      </TouchableOpacity>
-      
-      </View>
+  
+      {loading && (
+        <View style={tw`flex-row justify-center items-center`}>
+          <Text style={tw`font-semibold text-center text-white text-lg`}>Loading...</Text>
+          <ActivityIndicator size="large" color="#FFF" />
+        </View>
+      )}
+  
+      {!loading && (
+        <View style={tw`flex-row justify-center`}>
+          <TouchableOpacity style={tw`font-bold text-white px-1`} onPress={Login}>
+            <Text style={tw`font-bold text-white text-lg `}>Login</Text>
+          </TouchableOpacity>
+  
+          <TouchableOpacity style={tw`font-bold text-white px-1`} onPress={onSignUp}>
+            <Text style={tw`font-bold text-white text-lg`}>| Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
+  
 }
 
 export default EmailNPasswordLogin;
