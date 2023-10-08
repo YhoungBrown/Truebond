@@ -71,53 +71,75 @@ const HomeScreen = () => {
     const {user, logOut} = useAuth();
     const swipeRef = useRef(null);
     const [profiles, setProfiles] = useState([]);
+    const [profilepix, setProfilepix] = useState("")
 
+    console.log(profilepix)
    
     
-useEffect(() => {
-  let unsub;
-
-  const fetchCards = async () => {
-    const passesCollection = collection(db, 'users', user.uid, 'Passes');
-    const matchesCollection = collection(db, 'users', user.uid, 'Matches');
-
-     try {
-      // Wait for the passes to be retrieved
-      const snapshot = await getDocs(passesCollection);
-      const passes = snapshot.docs.map((doc) => doc.id);
-      console.log(passes);
-      const passedUsersId = passes.length > 0 ? passes : ["test"];
-
-
-      const matchesSnapshot = await getDocs(matchesCollection);
-      const matches = matchesSnapshot.docs.map((doc) => doc.id);
-      console.log(matches);
-      const matchedUsersId = matches.length > 0 ? matches : ["test"];
-
-    //the query below if so that when we're fetching our data from firebase, users that we have in our swipedPass should not show again. if we dont do this, we'll have to keep swipping over a user repititively evrytime we login when there are lot of other profiles that we havent even seen yet
-
-    unsub = onSnapshot(query(collection(db, 'users'), where("id", "not-in", [...passedUsersId, ...matchedUsersId])), (snapshot) => (      
-      setProfiles(
-      //the filter is to remove any doc id that matches the user uid(since it is the user uid tht also serve as the doc id) that way we wont see our own profile when swipping inorder to prevent going on a date with ourself
-        snapshot.docs
-        .filter((doc) => doc.id !== user.uid)
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-      )
-    ))
-      } catch (error) {
-        console.error('Error fetching passes:', error);
+    useEffect(() => {
+      let unsubProfiles;
+      let unsubCurrentUser;
+    
+      const fetchCards = async () => {
+        const passesCollection = collection(db, 'users', user.uid, 'Passes');
+        const matchesCollection = collection(db, 'users', user.uid, 'Matches');
+    
+        try {
+          // Wait for the passes to be retrieved
+          const snapshot = await getDocs(passesCollection);
+          const passes = snapshot.docs.map((doc) => doc.id);
+          console.log(passes);
+          const passedUsersId = passes.length > 0 ? passes : ["test"];
+    
+          const matchesSnapshot = await getDocs(matchesCollection);
+          const matches = matchesSnapshot.docs.map((doc) => doc.id);
+          console.log(matches);
+          const matchedUsersId = matches.length > 0 ? matches : ["test"];
+    
+          // Create a query to retrieve user profiles that are not in passes or matches
+          const profilesQuery = query(
+            collection(db, 'users'),
+            where("id", "not-in", [...passedUsersId, ...matchedUsersId])
+          );
+    
+          // Set up the snapshot listener for other user profiles
+          unsubProfiles = onSnapshot(profilesQuery, (snapshot) => {
+            setProfiles(
+              snapshot.docs
+                .filter((doc) => doc.id !== user.uid)
+                .map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+                }))
+            );
+          });
+    
+          // Create a reference to the current user's document
+          const currentUserDocRef = doc(db, 'users', user.uid);
+    
+          // Set up a snapshot listener to track changes to the current user's document
+          unsubCurrentUser = onSnapshot(currentUserDocRef, (docSnapshot) => {
+            const userData = docSnapshot.data();
+            if (userData) {
+              setProfilepix(userData.PhotoUrl);
+            }
+          });
+        } catch (error) {
+          console.error('Error fetching passes:', error);
+        }
       }
-  }
-
-  console.log(profiles)
-
-  fetchCards();
-  return unsub;
-},[])
-
+    
+      console.log(profiles)
+    
+      fetchCards();
+      
+      // Return functions to unsubscribe when the component unmounts
+      return () => {
+        if (unsubProfiles) unsubProfiles();
+        if (unsubCurrentUser) unsubCurrentUser();
+      };
+    }, []);
+    
     useLayoutEffect(() => {
       navigation.setOptions({
         headerShown: false
@@ -187,11 +209,12 @@ useEffect(() => {
       {/**Header */}
       <View style={tw`items-center flex-row justify-between px-5`}>
         <TouchableOpacity onPress={logOut}>
-            <Image
+          <Image
             style={tw`h-10 w-10 rounded-full`} 
-            // source={{ uri: user.photoURL }} <- This is the way to do it assuming my google authentication(social login) worked
-            source={require('../assets/YhoungBrown.jpg')} 
-            />
+            source={{ uri: profilepix }}
+            onError={() => console.log("Image load error")} // Handle errors
+/>
+
         </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Modal")}>
